@@ -37,6 +37,7 @@ export async function deleteUser(id: string): Promise<void> {
         console.log(`User with id ${id} has been deleted.`)
         revalidatePath('/') // Revalidate the page or component path
     } catch (error) {
+        console.error('Error deleting user:', error)
         throw new Error(`User with id ${id} not found`)
     }
 }
@@ -56,6 +57,7 @@ export async function updateUser(id: string, data: Partial<Omit<User, 'id'>>): P
         
         return validatedUser
     } catch (error) {
+        console.error('Error updating user:', error)
         throw new Error(`User with id ${id} not found`)
     }
 }
