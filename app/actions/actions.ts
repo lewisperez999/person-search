@@ -11,13 +11,75 @@ export async function searchUsers(query: string): Promise<User[]> {
     console.log('Searching users with query:', query)
     const results = await prisma.user.findMany({
         where: {
-            name: {
-                startsWith: query,
-            }
+            OR: [
+                {
+                    name: {
+                        contains: query,
+                    }
+                },
+                {
+                    email: {
+                        contains: query,
+                    }
+                },
+                {
+                    phoneNumber: {
+                        contains: query,
+                    }
+                }
+            ]
         }
     })
     console.log('Search results:', results)
     return results
+}
+
+export async function getAllUsers(
+    page: number = 1, 
+    limit: number = 10, 
+    search: string = ''
+): Promise<{ users: User[]; total: number; totalPages: number }> {
+    const skip = (page - 1) * limit
+    
+    const where = search ? {
+        OR: [
+            {
+                name: {
+                    contains: search,
+                }
+            },
+            {
+                email: {
+                    contains: search,
+                }
+            },
+            {
+                phoneNumber: {
+                    contains: search,
+                }
+            }
+        ]
+    } : {}
+
+    const [users, total] = await Promise.all([
+        prisma.user.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: {
+                name: 'asc'
+            }
+        }),
+        prisma.user.count({ where })
+    ])
+
+    const totalPages = Math.ceil(total / limit)
+
+    return {
+        users,
+        total,
+        totalPages
+    }
 }
 
 export async function addUser(data: Omit<User, 'id'>): Promise<User> {

@@ -1,6 +1,7 @@
 // app/components/user-dialog.tsx
 'use client'
 
+import React from 'react'
 import {  addUser } from '@/app/actions/actions'
 import { userFormSchema, User, UserFormData } from '@/app/actions/schemas'
 
@@ -8,10 +9,18 @@ import { UserForm } from './user-form'
 import MutableDialog, { ActionState }  from '@/components/mutable-dialog'
 
 
-export function UserDialog() {
+interface UserDialogProps {
+  children?: React.ReactNode
+  onUserAdded?: (user: User) => void
+}
+
+export function UserDialog({ children, onUserAdded }: UserDialogProps) {
   const handleAddUser = async (data: UserFormData): Promise<ActionState<User>> => {
     try {
       const newUser = await addUser(data)
+      if (onUserAdded) {
+        onUserAdded(newUser)
+      }
       return {
         success: true,
         message: `User ${newUser.name} added successfully`,
@@ -35,6 +44,7 @@ export function UserDialog() {
       dialogDescription="Fill out the form below to add a new user."
       submitButtonLabel="Save"
       defaultValues={{ name: '', email: '', phoneNumber: '' }} // Default empty values
+      customTrigger={children}
     />
   )
 }

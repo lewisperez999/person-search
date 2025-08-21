@@ -33,6 +33,7 @@ interface GenericDialogProps<T extends FieldValues> {
   dialogDescription?: string;
   submitButtonLabel?: string;
   defaultValues?: DefaultValues<T>; // If present, this will indicate edit mode
+  customTrigger?: React.ReactNode; // Optional custom trigger element
 }
 
 export default function MutableDialog<T extends FieldValues>({
@@ -45,6 +46,7 @@ export default function MutableDialog<T extends FieldValues>({
   editDialogTitle = 'Edit',
   dialogDescription = defaultValues ? 'Make changes to your item here. Click save when you\'re done.' : 'Fill out the form below to add a new item.',
   submitButtonLabel = defaultValues ? 'Save' : 'Add',
+  customTrigger,
 }: GenericDialogProps<T>) {
   const [open, setOpen] = useState(false);
 
@@ -110,7 +112,7 @@ export default function MutableDialog<T extends FieldValues>({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button >{triggerButtonLabel}</Button>
+        {customTrigger ? customTrigger : <Button>{triggerButtonLabel}</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
